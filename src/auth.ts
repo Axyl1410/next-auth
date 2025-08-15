@@ -1,18 +1,10 @@
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import NextAuth from "next-auth";
-import { Provider } from "next-auth/providers";
-import GitHub from "next-auth/providers/github";
-
-const providers: Provider[] = [GitHub];
-
-export const providerMap = providers.map((provider) => {
-  if (typeof provider === "function") {
-    const providerData = provider();
-    return { id: providerData.id, name: providerData.name };
-  } else {
-    return { id: provider.id, name: provider.name };
-  }
-});
+import authConfig from "./auth.config";
+import client from "./lib/db";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers,
+  adapter: MongoDBAdapter(client),
+  session: { strategy: "jwt" },
+  ...authConfig,
 });
